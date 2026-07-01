@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 
 /*
@@ -13,10 +13,11 @@ public class Program
 
     // new flag for error
     const string InvalidInputMessage = "Invalid input. Please try again.";
-    private static MySqlBookRepository ripo = new MySqlBookRepository();
+    const string DatabaseErrorMessage = "Database error occurred. Operation failed.";
     public static void Main(string[] args)
     {
-        Library library = new Library();
+        IBookRepository repository = new MySqlBookRepository();
+        Library library = new Library(repository);
         bool running = true;
         
 
@@ -90,12 +91,6 @@ public class Program
 
 
 
-
-
-
-
-
-
     // DRY helper methods for console input
     static string GetInput(string prompt)
     {
@@ -116,8 +111,6 @@ public class Program
     // Unified DRY helper for adding books
     static void ExecuteAddBook(Library library, string user_choice)
     {
-        // Ripo to add SQL data
-        // MySqlBookRepository ripo = new MySqlBookRepository();
 
         string idInput = GetInput("Enter ID: ");
         string title = GetInput("Enter Title: ");
@@ -141,9 +134,14 @@ public class Program
                     }
 
                     PhysicalBook pb = new PhysicalBook(id, title, author, pages, copies);
-                    library.AddBook(pb);
-                    // add to sql
-                    ripo.Add(pb); 
+                    if (library.AddBook(pb))
+                    {
+                        Console.WriteLine("\nBook added successfully");
+                    }
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
+                    }
                     break;
                 }
 
@@ -162,9 +160,15 @@ public class Program
                     }
 
                     DigitalBook db = new DigitalBook(id, title, author, size, format);
-                    library.AddBook(db);
+                    if (library.AddBook(db))
+                    {
+                        Console.WriteLine("\nBook added successfully");
+                    }
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
+                    }
                     // add to sql
-                    ripo.Add(db); 
                     break;
                 }
 
@@ -183,9 +187,14 @@ public class Program
                     }
 
                     AudioBook ab = new AudioBook(id, title, author, duration, narrator);
-                    library.AddBook(ab);
-                    // add to sql
-                    ripo.Add(ab); 
+                    if (library.AddBook(ab))
+                    {
+                        Console.WriteLine("\nBook added successfully");
+                    }
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
+                    }
                     break;
                 }
         }
@@ -201,15 +210,13 @@ public class Program
             return;
         }
 
-        // if (ripo.GetById(id))
         if (library.BorrowBook(id))
         {
-            ripo.GetById(id);
             Console.WriteLine("Book borrowed successfully");
         }
         else
         {
-            Console.WriteLine("Error, book not borrowed");
+            Console.WriteLine(DatabaseErrorMessage);
         }
     }
 
@@ -229,7 +236,7 @@ public class Program
         }
         else
         {
-            Console.WriteLine("Error, book not returned");
+            Console.WriteLine(DatabaseErrorMessage);
         }
     }
 }
