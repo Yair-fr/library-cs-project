@@ -1,5 +1,5 @@
 // Base class for books
-public class Book
+public abstract class Book
 {
     // Private backing fields
     private int _id;
