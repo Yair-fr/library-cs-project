@@ -12,7 +12,7 @@ public class MySqlBookRepository : IBookRepository
     }
 
     public MySqlBookRepository()
-        : this("server=localhost;database=library_db;user=root;password=Vigodman1340;")
+        : this("server=localhost;database=library_db;user=root;password=admin;")
     {
     }
 
