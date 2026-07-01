@@ -1,45 +1,92 @@
-using System;
-using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 public class MySqlBookRepository : IBookRepository
 {
-    private string _connectionString;
+    // Check user and password
+    private string _connectionString = "server=localhost;database=library_db;user=root;password=admin;";
 
     public MySqlBookRepository(string connectionString)
     {
         _connectionString = connectionString;
     }
 
-    public MySqlBookRepository()
-        : this("server=localhost;database=library_db;user=root;password=admin;")
+    // Empty constructor
+    public MySqlBookRepository() : this("server=localhost;database=library_db;user=root;password=admin;")
     {
     }
 
     public bool Add(Book book)
     {
-        if (book == null)
-        {
-            return false;
-        }
+        string insertSql = "INSERT INTO books (id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator) " +
+                           "VALUES (@id, @title, @author, @type, @pages, @available_copies, @file_size_mb, @format, @duration_minutes, @narrator)";
 
-        string sql = @"INSERT INTO books
-            (id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator)
-            VALUES
-            (@id, @title, @author, @type, @pages, @available_copies, @file_size_mb, @format, @duration_minutes, @narrator)";
+        string type;
+        int? pages;
+        int? copies;
+        double? size;
+        string? format;
+        int? duration;
+        string? narrator;
+
+        // Pattern matching switch statement to extract specific subclass properties safely
+        switch (book)
+        {
+            case PhysicalBook p:
+                type = "PHYSICAL";
+                pages = p.Pages;
+                copies = p.AvailableCopies;
+                size = null;
+                format = null;
+                duration = null;
+                narrator = null;
+                break;
+
+            case DigitalBook d:
+                type = "DIGITAL";
+                pages = null;
+                copies = null;
+                size = d.FileSizeMB;
+                format = d.Format;
+                duration = null;
+                narrator = null;
+                break;
+
+            case AudioBook a:
+                type = "AUDIO";
+                pages = null;
+                copies = null;
+                size = null;
+                format = null;
+                duration = a.DurationMinutes;
+                narrator = a.Narrator;
+                break;
+
+            default:
+                return false; // Unknown book type, abort execution safely
+        }
 
         try
         {
             using (MySqlConnection conn = new MySqlConnection(_connectionString))
-            using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+            using (MySqlCommand cmd = new MySqlCommand(insertSql, conn))
             {
-                if (!AddBookParameters(cmd, book))
-                {
-                    return false;
-                }
-
                 conn.Open();
-                return cmd.ExecuteNonQuery() == 1;
+
+                cmd.Parameters.AddWithValue("@id", book.Id);
+                cmd.Parameters.AddWithValue("@title", book.Title);
+                cmd.Parameters.AddWithValue("@author", book.Author);
+                cmd.Parameters.AddWithValue("@type", type);
+
+                // For columns that do not belong to the current book type, send DBNull.Value to MySQL
+                cmd.Parameters.AddWithValue("@pages", pages.HasValue ? (object)pages.Value : DBNull.Value);
+                cmd.Parameters.AddWithValue("@available_copies", copies.HasValue ? (object)copies.Value : DBNull.Value);
+                cmd.Parameters.AddWithValue("@file_size_mb", size.HasValue ? (object)size.Value : DBNull.Value);
+                cmd.Parameters.AddWithValue("@format", format != null ? (object)format : DBNull.Value);
+                cmd.Parameters.AddWithValue("@duration_minutes", duration.HasValue ? (object)duration.Value : DBNull.Value);
+                cmd.Parameters.AddWithValue("@narrator", narrator != null ? (object)narrator : DBNull.Value);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+                return rowsAffected == 1;
             }
         }
         catch (MySqlException)
@@ -50,15 +97,13 @@ public class MySqlBookRepository : IBookRepository
 
     public Book? GetById(int id)
     {
-        string sql = @"SELECT id, title, author, type, pages, available_copies,
-                              file_size_mb, format, duration_minutes, narrator
-                       FROM books
-                       WHERE id = @id";
+        string selectSql = "SELECT id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator " +
+                           "FROM books WHERE id = @id";
 
         try
         {
             using (MySqlConnection conn = new MySqlConnection(_connectionString))
-            using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+            using (MySqlCommand cmd = new MySqlCommand(selectSql, conn))
             {
                 cmd.Parameters.AddWithValue("@id", id);
 
@@ -83,16 +128,15 @@ public class MySqlBookRepository : IBookRepository
 
     public Book[] GetAll()
     {
-        List<Book> books = new List<Book>();
+        Book[] books = new Book[100];
+        int currentIndex = 0;
 
-        string sql = @"SELECT id, title, author, type, pages, available_copies,
-                              file_size_mb, format, duration_minutes, narrator
-                       FROM books";
+        string selectSql = "SELECT id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator FROM books";
 
         try
         {
             using (MySqlConnection conn = new MySqlConnection(_connectionString))
-            using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+            using (MySqlCommand cmd = new MySqlCommand(selectSql, conn))
             {
                 conn.Open();
 
@@ -100,11 +144,17 @@ public class MySqlBookRepository : IBookRepository
                 {
                     while (reader.Read())
                     {
-                        Book? book = CreateBookFromReader(reader);
+                        Book? currentBook = CreateBookFromReader(reader);
 
-                        if (book != null)
+                        if (currentBook != null)
                         {
-                            books.Add(book);
+                            if (currentIndex >= books.Length)
+                            {
+                                Array.Resize(ref books, books.Length * 2);
+                            }
+
+                            books[currentIndex] = currentBook;
+                            currentIndex++;
                         }
                     }
                 }
@@ -115,41 +165,30 @@ public class MySqlBookRepository : IBookRepository
             return new Book[0];
         }
 
-        return books.ToArray();
+        Array.Resize(ref books, currentIndex);
+        return books;
     }
 
     public bool Update(Book book)
     {
-        if (book == null)
-        {
-            return false;
-        }
-
-        string sql = @"UPDATE books SET
-            title = @title,
-            author = @author,
-            type = @type,
-            pages = @pages,
-            available_copies = @available_copies,
-            file_size_mb = @file_size_mb,
-            format = @format,
-            duration_minutes = @duration_minutes,
-            narrator = @narrator
-            WHERE id = @id";
-
         try
         {
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
-            using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+            if (book is PhysicalBook pb)
             {
-                if (!AddBookParameters(cmd, book))
+                using (MySqlConnection conn = new MySqlConnection(_connectionString))
+                using (MySqlCommand cmd = new MySqlCommand(
+                    "UPDATE books SET available_copies = @available_copies WHERE id = @id", conn))
                 {
-                    return false;
-                }
+                    cmd.Parameters.AddWithValue("@available_copies", pb.AvailableCopies);
+                    cmd.Parameters.AddWithValue("@id", pb.Id);
 
-                conn.Open();
-                return cmd.ExecuteNonQuery() == 1;
+                    conn.Open();
+                    return cmd.ExecuteNonQuery() == 1;
+                }
             }
+
+            // DigitalBook and AudioBook do not change when borrowed/returned.
+            return true;
         }
         catch (MySqlException)
         {
@@ -159,12 +198,10 @@ public class MySqlBookRepository : IBookRepository
 
     public bool Delete(int id)
     {
-        string sql = "DELETE FROM books WHERE id = @id";
-
         try
         {
             using (MySqlConnection conn = new MySqlConnection(_connectionString))
-            using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+            using (MySqlCommand cmd = new MySqlCommand("DELETE FROM books WHERE id = @id", conn))
             {
                 cmd.Parameters.AddWithValue("@id", id);
 
@@ -178,118 +215,37 @@ public class MySqlBookRepository : IBookRepository
         }
     }
 
-    private bool AddBookParameters(MySqlCommand cmd, Book book)
-    {
-        cmd.Parameters.AddWithValue("@id", book.Id);
-        cmd.Parameters.AddWithValue("@title", book.Title);
-        cmd.Parameters.AddWithValue("@author", book.Author);
-
-        if (book is PhysicalBook physical)
-        {
-            cmd.Parameters.AddWithValue("@type", "PHYSICAL");
-            cmd.Parameters.AddWithValue("@pages", physical.Pages);
-            cmd.Parameters.AddWithValue("@available_copies", physical.AvailableCopies);
-            cmd.Parameters.AddWithValue("@file_size_mb", DBNull.Value);
-            cmd.Parameters.AddWithValue("@format", DBNull.Value);
-            cmd.Parameters.AddWithValue("@duration_minutes", DBNull.Value);
-            cmd.Parameters.AddWithValue("@narrator", DBNull.Value);
-            return true;
-        }
-
-        if (book is DigitalBook digital)
-        {
-            cmd.Parameters.AddWithValue("@type", "DIGITAL");
-            cmd.Parameters.AddWithValue("@pages", DBNull.Value);
-            cmd.Parameters.AddWithValue("@available_copies", DBNull.Value);
-            cmd.Parameters.AddWithValue("@file_size_mb", digital.FileSizeMB);
-            cmd.Parameters.AddWithValue("@format", digital.Format);
-            cmd.Parameters.AddWithValue("@duration_minutes", DBNull.Value);
-            cmd.Parameters.AddWithValue("@narrator", DBNull.Value);
-            return true;
-        }
-
-        if (book is AudioBook audio)
-        {
-            cmd.Parameters.AddWithValue("@type", "AUDIO");
-            cmd.Parameters.AddWithValue("@pages", DBNull.Value);
-            cmd.Parameters.AddWithValue("@available_copies", DBNull.Value);
-            cmd.Parameters.AddWithValue("@file_size_mb", DBNull.Value);
-            cmd.Parameters.AddWithValue("@format", DBNull.Value);
-            cmd.Parameters.AddWithValue("@duration_minutes", audio.DurationMinutes);
-            cmd.Parameters.AddWithValue("@narrator", audio.Narrator);
-            return true;
-        }
-
-        return false;
-    }
-
     private Book? CreateBookFromReader(MySqlDataReader reader)
     {
-        int id = reader.GetInt32(reader.GetOrdinal("id"));
-        string title = reader.GetString(reader.GetOrdinal("title"));
-        string author = reader.GetString(reader.GetOrdinal("author"));
-        string type = reader.GetString(reader.GetOrdinal("type")).ToUpper();
+        int id = reader.GetInt32("id");
+        string title = reader.GetString("title");
+        string author = reader.GetString("author");
+        string type = reader.GetString("type").ToUpper();
 
         if (type == "PHYSICAL")
         {
-            int pages = GetIntOrZero(reader, "pages");
-            int copies = GetIntOrZero(reader, "available_copies");
+            int pages = reader.IsDBNull(reader.GetOrdinal("pages")) ? 0 : reader.GetInt32("pages");
+            int copies = reader.IsDBNull(reader.GetOrdinal("available_copies")) ? 0 : reader.GetInt32("available_copies");
 
             return new PhysicalBook(id, title, author, pages, copies);
         }
 
         if (type == "DIGITAL")
         {
-            double fileSize = GetDoubleOrZero(reader, "file_size_mb");
-            string format = GetStringOrEmpty(reader, "format");
+            double fileSize = reader.IsDBNull(reader.GetOrdinal("file_size_mb")) ? 0.0 : reader.GetDouble("file_size_mb");
+            string format = reader.IsDBNull(reader.GetOrdinal("format")) ? "" : reader.GetString("format");
 
             return new DigitalBook(id, title, author, fileSize, format);
         }
 
         if (type == "AUDIO")
         {
-            int duration = GetIntOrZero(reader, "duration_minutes");
-            string narrator = GetStringOrEmpty(reader, "narrator");
+            int duration = reader.IsDBNull(reader.GetOrdinal("duration_minutes")) ? 0 : reader.GetInt32("duration_minutes");
+            string narrator = reader.IsDBNull(reader.GetOrdinal("narrator")) ? "" : reader.GetString("narrator");
 
             return new AudioBook(id, title, author, duration, narrator);
         }
 
         return null;
-    }
-
-    private int GetIntOrZero(MySqlDataReader reader, string columnName)
-    {
-        int index = reader.GetOrdinal(columnName);
-
-        if (reader.IsDBNull(index))
-        {
-            return 0;
-        }
-
-        return reader.GetInt32(index);
-    }
-
-    private double GetDoubleOrZero(MySqlDataReader reader, string columnName)
-    {
-        int index = reader.GetOrdinal(columnName);
-
-        if (reader.IsDBNull(index))
-        {
-            return 0.0;
-        }
-
-        return reader.GetDouble(index);
-    }
-
-    private string GetStringOrEmpty(MySqlDataReader reader, string columnName)
-    {
-        int index = reader.GetOrdinal(columnName);
-
-        if (reader.IsDBNull(index))
-        {
-            return "";
-        }
-
-        return reader.GetString(index);
     }
 }
