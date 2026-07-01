@@ -40,17 +40,29 @@ class conn_to_sql
                 // 2. INSERT Command (Secure parameterized data insertion)
                 // ==========================================
 
-                // string insertSql = "INSERT INTO cars (name, price, year) VALUES (@name, @price, @year);";
-                // using (MySqlCommand cmd = new MySqlCommand(insertSql, conn))
-                // {
-                //     // Parameterized assignments preventing SQL Injection vulnerabilities
-                //     cmd.Parameters.AddWithValue("@name", "Toyota Yaris");
-                //     cmd.Parameters.AddWithValue("@price", 96000);
-                //     cmd.Parameters.AddWithValue("@year", 2016);
-                //     
-                //     int rowsInserted = cmd.ExecuteNonQuery();
-                //     Console.WriteLine($"[INSERT] Added 'Toyota Yaris' (2016). Rows affected: {rowsInserted}");
-                // }
+                string insertSql = "INSERT INTO books (id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator) " +
+                                    "VALUES (@id, @title, @author, @type, @pages, @available_copies, @file_size_mb, @format, @duration_minutes, @narrator)";
+
+                using (MySqlCommand cmd = new MySqlCommand(insertSql, conn))
+                {
+                    // SQL Injection
+                    cmd.Parameters.AddWithValue("@id", 1);
+                    cmd.Parameters.AddWithValue("@title", "The Great Gatsby");
+                    cmd.Parameters.AddWithValue("@author", "F. Scott Fitzgerald");
+                    cmd.Parameters.AddWithValue("@type", "PHYSICAL");
+                    cmd.Parameters.AddWithValue("@pages", 180);
+                    cmd.Parameters.AddWithValue("@available_copies", 5);
+
+                    // Null values
+                    cmd.Parameters.AddWithValue("@file_size_mb", DBNull.Value);
+                    cmd.Parameters.AddWithValue("@format", DBNull.Value);
+                    cmd.Parameters.AddWithValue("@duration_minutes", DBNull.Value);
+                    cmd.Parameters.AddWithValue("@narrator", DBNull.Value);
+
+                    int rowsInserted = cmd.ExecuteNonQuery();
+                    Console.WriteLine($"[INSERT] Added '{cmd.Parameters["@title"].Value}'. Rows affected: {rowsInserted}");
+                }
+
 
 
                 // ==========================================
@@ -71,27 +83,40 @@ class conn_to_sql
                 // ==========================================
                 // 4. SELECT Command & Formatted Grid Display
                 // ==========================================
-                string selectSql = "SELECT id, name, price, year FROM cars;"; // update the SELECT query to TABLE
+                // Select all columns from the books table to match all insert parameters
+                string selectSql = "SELECT id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator FROM books;";
+
                 using (MySqlCommand cmd = new MySqlCommand(selectSql, conn))
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    Console.WriteLine("\n=============================================================");
-                    // Fixed-width alignment configurations to format console tabular display
-                    Console.WriteLine($"| {"ID",-5} | {"Car Name",-20} | {"Price (NIS)",-12} | {"Year",-6} |"); // Edit the TABLE titles for nice print
-                    Console.WriteLine("-------------------------------------------------------------");
+                    Console.WriteLine("\n=================================================================================================================================================");
+                    // Fixed-width alignment configurations to format console tabular display for all 10 columns
+                    Console.WriteLine($"| {"ID",-4} | {"Title",-22} | {"Author",-18} | {"Type",-8} | {"Pages",-5} | {"Copies",-6} | {"Size(MB)",-8} | {"Format",-6} | {"Min",-5} | {"Narrator",-15} |");
+                    Console.WriteLine("-------------------------------------------------------------------------------------------------------------------------------------------------");
 
                     while (reader.Read())
                     {
+                        // 1. Read non-nullable columns directly
                         int id = reader.GetInt32("id");
-                        string name = reader.GetString("name");
-                        int price = reader.GetInt32("price");
-                        int year = reader.GetInt32("year");
+                        string title = reader.GetString("title");
+                        string author = reader.GetString("author");
+                        string type = reader.GetString("type");
 
-                        // Printing structured table line using standard thousands separators (:N0)
-                        Console.WriteLine($"| {id,-5} | {name,-20} | {price,-12:N0} | {year,-6} |");
+                        // 2. Handle all nullable columns safely using IsDBNull to prevent runtime exceptions
+                        string pages = reader.IsDBNull(reader.GetOrdinal("pages")) ? "N/A" : reader.GetInt32("pages").ToString();
+                        string copies = reader.IsDBNull(reader.GetOrdinal("available_copies")) ? "N/A" : reader.GetInt32("available_copies").ToString();
+                        string fileSize = reader.IsDBNull(reader.GetOrdinal("file_size_mb")) ? "N/A" : reader.GetDouble("file_size_mb").ToString("0.0");
+                        string format = reader.IsDBNull(reader.GetOrdinal("format")) ? "N/A" : reader.GetString("format");
+                        string duration = reader.IsDBNull(reader.GetOrdinal("duration_minutes")) ? "N/A" : reader.GetInt32("duration_minutes").ToString();
+                        string narrator = reader.IsDBNull(reader.GetOrdinal("narrator")) ? "N/A" : reader.GetString("narrator");
+
+                        // 3. Print the perfectly structured table row
+                        Console.WriteLine($"| {id,-4} | {title,-22} | {author,-18} | {type,-8} | {pages,-5} | {copies,-6} | {fileSize,-8} | {format,-6} | {duration,-5} | {narrator,-15} |");
                     }
-                    Console.WriteLine("=============================================================");
+                    Console.WriteLine("=================================================================================================================================================");
                 }
+
+
                 conn.Close();
             }
         }

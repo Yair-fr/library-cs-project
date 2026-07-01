@@ -2,7 +2,7 @@
 
 
 /*
- *  Project Authors: Yair Friedensohn & Omri Vigodman
+ *  Project Authors: Yair Friedensohn & Omri Vigodman & Arad Tal
  */
 
 
@@ -13,10 +13,12 @@ public class Program
 
     // new flag for error
     const string InvalidInputMessage = "Invalid input. Please try again.";
+    private static MySqlBookRepository ripo = new MySqlBookRepository();
     public static void Main(string[] args)
     {
         Library library = new Library();
         bool running = true;
+        
 
 
 
@@ -114,6 +116,9 @@ public class Program
     // Unified DRY helper for adding books
     static void ExecuteAddBook(Library library, string user_choice)
     {
+        // Ripo to add SQL data
+        // MySqlBookRepository ripo = new MySqlBookRepository();
+
         string idInput = GetInput("Enter ID: ");
         string title = GetInput("Enter Title: ");
         string author = GetInput("Enter Author: ");
@@ -137,6 +142,8 @@ public class Program
 
                     PhysicalBook pb = new PhysicalBook(id, title, author, pages, copies);
                     library.AddBook(pb);
+                    // add to sql
+                    ripo.Add(pb); 
                     break;
                 }
 
@@ -156,6 +163,8 @@ public class Program
 
                     DigitalBook db = new DigitalBook(id, title, author, size, format);
                     library.AddBook(db);
+                    // add to sql
+                    ripo.Add(db); 
                     break;
                 }
 
@@ -175,6 +184,8 @@ public class Program
 
                     AudioBook ab = new AudioBook(id, title, author, duration, narrator);
                     library.AddBook(ab);
+                    // add to sql
+                    ripo.Add(ab); 
                     break;
                 }
         }
@@ -190,8 +201,10 @@ public class Program
             return;
         }
 
+        // if (ripo.GetById(id))
         if (library.BorrowBook(id))
         {
+            ripo.GetById(id);
             Console.WriteLine("Book borrowed successfully");
         }
         else
