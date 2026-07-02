@@ -6,7 +6,7 @@ public abstract class Book
     private string _title;
     private string _author;
 
-    // Constractor
+    // Constractor for derived classes
     public Book(int id, string title, string author)
     {
         Id = id;            // Invokes Id setter validation

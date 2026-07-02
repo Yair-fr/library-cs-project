@@ -1,4 +1,4 @@
-=======MENU=========
+
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -10,15 +10,103 @@
 9. Physical book report 
 10. Exit 
 
-Enter choise: 1
-Enter ID: 111
-Enter Title: Harry Potter
-Enter Author: j.k rowling
-Enter Pages: 357
+4
+Physical Book; 1; one; omri; 1; 0
+Digital Book; 2; two; yair; 12; pdf
+Audio Book; 3; three; arad; 123; momo
+Digital Book; 22; tomtom; tom; 22; pdf
+Audio Book; 33; tronT; tronT; 40; joeR
+Physical Book; 111; OPER; momomo; 78; 3
+Physical Book; 1234; python-book; yairF; 90; 2
+
+1. Add physical book 
+2. Add digital book 
+3. Add audio book 
+4. List all books 
+5. Borrow book 
+6. Return book 
+7. Digital book report 
+8. Audio book report 
+9. Physical book report 
+10. Exit 
+
+6
+Enter Book ID to Return: 1
+Book returned successfully!
+
+1. Add physical book 
+2. Add digital book 
+3. Add audio book 
+4. List all books 
+5. Borrow book 
+6. Return book 
+7. Digital book report 
+8. Audio book report 
+9. Physical book report 
+10. Exit 
+
+4
+Physical Book; 1; one; omri; 1; 1
+Digital Book; 2; two; yair; 12; pdf
+Audio Book; 3; three; arad; 123; momo
+Digital Book; 22; tomtom; tom; 22; pdf
+Audio Book; 33; tronT; tronT; 40; joeR
+Physical Book; 111; OPER; momomo; 78; 3
+Physical Book; 1234; python-book; yairF; 90; 2
+
+1. Add physical book 
+2. Add digital book 
+3. Add audio book 
+4. List all books 
+5. Borrow book 
+6. Return book 
+7. Digital book report 
+8. Audio book report 
+9. Physical book report 
+10. Exit 
+
+PS C:\Csharp_Projects\FINAL-PROJECT_PART_2_Yair_&_Omri_Arad>  & 'c:\Users\yaeir\.vscode\extensions\ms-dotnettools.csharp-2.140.9-win32-x64\.debugger\x86_64\vsdbg.exe' '--interpreter=vscode' '--connection=3cb88c42a1984a10b40a75221306fdf1' 
+
+1. Add physical book 
+2. Add digital book 
+3. Add audio book 
+4. List all books 
+5. Borrow book 
+6. Return book 
+7. Digital book report 
+8. Audio book report 
+9. Physical book report 
+10. Exit 
+
+4
+Physical Book; 1; one; omri; 1; 1
+Digital Book; 2; two; yair; 12; pdf
+Audio Book; 3; three; arad; 123; momo
+Digital Book; 22; tomtom; tom; 22; pdf
+Audio Book; 33; tronT; tronT; 40; joeR
+Physical Book; 111; OPER; momomo; 78; 3
+Physical Book; 1234; python-book; yairF; 90; 2
+
+1. Add physical book 
+2. Add digital book 
+3. Add audio book 
+4. List all books 
+5. Borrow book 
+6. Return book 
+7. Digital book report 
+8. Audio book report 
+9. Physical book report 
+10. Exit 
+
+1
+Enter ID: 1111
+Enter Title: book-1
+Enter Author: P-book
+Enter Pages: 100
 Enter Available Copies: 4
+
 Book added successfully
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -30,15 +118,16 @@ Book added successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 2
-Enter ID: 234
-Enter Title: Lord of the Rings
-Enter Author: J. R. R. Tolkein
-Enter File Size: 34.6
-Enter Format: azw
-Book added successfully
+4
+Physical Book; 1; one; omri; 1; 1
+Digital Book; 2; two; yair; 12; pdf
+Audio Book; 3; three; arad; 123; momo
+Digital Book; 22; tomtom; tom; 22; pdf
+Audio Book; 33; tronT; tronT; 40; joeR
+Physical Book; 111; OPER; momomo; 78; 3
+Physical Book; 1111; book-1; P-book; 100; 4
+Physical Book; 1234; python-book; yairF; 90; 2
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -50,15 +139,8 @@ Book added successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 3
-Enter ID: 78
-Enter Title: Brave New World
-Enter Author: A. Huxley
-Enter Duration: 78
-Enter Narrator: Matt Smith 
-Book added successfully
+9
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -70,12 +152,9 @@ Book added successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 4
-Physical Book; 111; Harry Potter; j.k rowling; 357; 4
-Digital Book; 234; Lord of the Rings; J. R. R. Tolkein; 34.6; azw
-Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith 
+8
+163; 123
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -87,11 +166,9 @@ Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith
 9. Physical book report 
 10. Exit 
 
-Enter choise: 5
-Enter Book ID: 111
-Book borrowed successfully
+7
+34; 22
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -103,9 +180,9 @@ Book borrowed successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 9
+8
+163; 123
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -117,9 +194,8 @@ Enter choise: 9
 9. Physical book report 
 10. Exit 
 
-Enter choise: 9
+9
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -131,12 +207,10 @@ Enter choise: 9
 9. Physical book report 
 10. Exit 
 
-Enter choise: 4
-Physical Book; 111; Harry Potter; j.k rowling; 357; 3
-Digital Book; 234; Lord of the Rings; J. R. R. Tolkein; 34.6; azw
-Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith 
+5
+Enter Book ID to Borrow: 1
+Book borrowed successfully!
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -148,11 +222,9 @@ Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith
 9. Physical book report 
 10. Exit 
 
-Enter choise: 5
-Enter Book ID: 111
-Book borrowed successfully
+9
+1; one
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -164,9 +236,16 @@ Book borrowed successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 9
+4
+Physical Book; 1; one; omri; 1; 0
+Digital Book; 2; two; yair; 12; pdf
+Audio Book; 3; three; arad; 123; momo
+Digital Book; 22; tomtom; tom; 22; pdf
+Audio Book; 33; tronT; tronT; 40; joeR
+Physical Book; 111; OPER; momomo; 78; 3
+Physical Book; 1111; book-1; P-book; 100; 4
+Physical Book; 1234; python-book; yairF; 90; 2
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -178,11 +257,10 @@ Enter choise: 9
 9. Physical book report 
 10. Exit 
 
-Enter choise: 5
-Enter Book ID: 111
-Book borrowed successfully
+5
+Enter Book ID to Borrow: 111
+Book borrowed successfully!
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -194,11 +272,10 @@ Book borrowed successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 5
-Enter Book ID: 111
-Book borrowed successfully
+5
+Enter Book ID to Borrow: 111
+Book borrowed successfully!
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -210,10 +287,10 @@ Book borrowed successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 9
-111; Harry Potter
+5
+Enter Book ID to Borrow: 111
+Book borrowed successfully!
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -225,11 +302,10 @@ Enter choise: 9
 9. Physical book report 
 10. Exit 
 
-Enter choise: 6
-Enter Book ID: 111
-Book returned successfully
+5
+Enter Book ID to Borrow: 111
+Database error occurred. Operation failed.
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -241,9 +317,9 @@ Book returned successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 9
+9
+1; one; 111; OPER
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -255,12 +331,10 @@ Enter choise: 9
 9. Physical book report 
 10. Exit 
 
-Enter choise: 4
-Physical Book; 111; Harry Potter; j.k rowling; 357; 1
-Digital Book; 234; Lord of the Rings; J. R. R. Tolkein; 34.6; azw
-Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith 
+6
+Enter Book ID to Return: 111
+Book returned successfully!
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -272,11 +346,10 @@ Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith
 9. Physical book report 
 10. Exit 
 
-Enter choise: 6
-Enter Book ID: 111
-Book returned successfully
+6
+Enter Book ID to Return: 1
+Book returned successfully!
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -288,11 +361,8 @@ Book returned successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 6
-Enter Book ID: 111
-Book returned successfully
+9
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -304,11 +374,16 @@ Book returned successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 6
-Enter Book ID: 111
-Book returned successfully
+4
+Physical Book; 1; one; omri; 1; 1
+Digital Book; 2; two; yair; 12; pdf
+Audio Book; 3; three; arad; 123; momo
+Digital Book; 22; tomtom; tom; 22; pdf
+Audio Book; 33; tronT; tronT; 40; joeR
+Physical Book; 111; OPER; momomo; 78; 1
+Physical Book; 1111; book-1; P-book; 100; 4
+Physical Book; 1234; python-book; yairF; 90; 2
 
-=======MENU=========
 1. Add physical book 
 2. Add digital book 
 3. Add audio book 
@@ -320,323 +395,4 @@ Book returned successfully
 9. Physical book report 
 10. Exit 
 
-Enter choise: 4
-Physical Book; 111; Harry Potter; j.k rowling; 357; 4
-Digital Book; 234; Lord of the Rings; J. R. R. Tolkein; 34.6; azw
-Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith 
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 7
-34.6; 34.6
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 2
-Enter ID: 874
-Enter Title: BIBO
-Enter Author: MOMO
-Enter File Size: 27.3
-Enter Format: PDF
-Book added successfully
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 7
-61.900000000000006; 34.6
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 8
-78; 78
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 3
-Enter ID: 948
-Enter Title: FEQF
-Enter Author: FEQ
-Enter Duration: 355
-Enter Narrator: AA
-Book added successfully
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 8
-433; 355
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 9
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 4
-Physical Book; 111; Harry Potter; j.k rowling; 357; 4
-Digital Book; 234; Lord of the Rings; J. R. R. Tolkein; 34.6; azw
-Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith 
-Digital Book; 874; BIBO; MOMO; 27.3; PDF
-Audio Book; 948; FEQF; FEQ; 355; AA
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 1
-Enter ID: 123465
-Enter Title: KING-JUNGLGE
-Enter Author: POPOP
-Enter Pages: 854
-Enter Available Copies: 1
-Book added successfully
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 4
-Physical Book; 111; Harry Potter; j.k rowling; 357; 4
-Digital Book; 234; Lord of the Rings; J. R. R. Tolkein; 34.6; azw
-Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith 
-Digital Book; 874; BIBO; MOMO; 27.3; PDF
-Audio Book; 948; FEQF; FEQ; 355; AA
-Physical Book; 123465; KING-JUNGLGE; POPOP; 854; 1
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 5
-Enter Book ID: 123465
-Book borrowed successfully
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 5
-Enter Book ID: 111
-Book borrowed successfully
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 5
-Enter Book ID: 111
-Book borrowed successfully
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 5
-Enter Book ID: 111
-Book borrowed successfully
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 5
-Enter Book ID: 111
-Book borrowed successfully
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 5
-Enter Book ID: 111
-Error, book not borrowed
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 9
-111; Harry Potter; 123465; KING-JUNGLGE
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
-
-Enter choise: 4
-Physical Book; 111; Harry Potter; j.k rowling; 357; 0
-Digital Book; 234; Lord of the Rings; J. R. R. Tolkein; 34.6; azw
-Audio Book; 78; Brave New World; A. Huxley; 78; Matt Smith 
-Digital Book; 874; BIBO; MOMO; 27.3; PDF
-Audio Book; 948; FEQF; FEQ; 355; AA
-Physical Book; 123465; KING-JUNGLGE; POPOP; 854; 0
-
-=======MENU=========
-1. Add physical book 
-2. Add digital book 
-3. Add audio book 
-4. List all books 
-5. Borrow book 
-6. Return book 
-7. Digital book report 
-8. Audio book report 
-9. Physical book report 
-10. Exit 
+10
