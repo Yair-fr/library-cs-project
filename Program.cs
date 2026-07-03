@@ -273,24 +273,24 @@ public class Program
         switch (book)
         {
             case PhysicalBook p:
-                 if (p.Borrow()) // update total -= 1
+                if (p.Borrow()) // update total -= 1
+                {
+                    if (repository.Update(p))
                     {
-                        if (repository.Update(p))
-                        {
-                            Console.WriteLine("Book borrowed successfully!");
-                        }
-                        else
-                        {
-                            Console.WriteLine(DatabaseErrorMessage);
-                        }
+                        Console.WriteLine("Book borrowed successfully!");
                     }
-                    break;
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
+                    }
+                }
+                break;
 
             case DigitalBook d:  // should always work if found on the library_db
             case AudioBook a:    // should always work if found on the library_db
                 Console.WriteLine("Book borrowed successfully!");
                 break;
-            
+
             default:    // null case -safty should not occur ->  if (book == null) than print error
                 break;
         }
@@ -299,109 +299,117 @@ public class Program
 
 
 
-        // Return logic using repository actions
-        static void ReturnBookUI(IBookRepository repository)
+    // Return logic using repository actions
+    static void ReturnBookUI(IBookRepository repository)
+    {
+        string idInput = GetInput("Enter Book ID to Return: ");
+        if (!TryReadNonNegativeInt(idInput, out int id))
         {
-            string idInput = GetInput("Enter Book ID to Return: ");
-            if (!TryReadNonNegativeInt(idInput, out int id))
-            {
-                Console.WriteLine(InvalidInputMessage);
-                return;
-            }
-
-            Book? book = repository.GetById(id);
-            if (book == null)
-            {
-                Console.WriteLine("Book not found.");
-                return;
-            }
-
-            if (book is PhysicalBook pb)
-            {
-                pb.Return(); // Decrease count back up
-                if (repository.Update(pb))
-                {
-                    Console.WriteLine("Book returned successfully!");
-                }
-                else
-                {
-                    Console.WriteLine(DatabaseErrorMessage);
-                }
-            }
-            else
-            {
-                Console.WriteLine(DatabaseErrorMessage);
-            }
+            Console.WriteLine(InvalidInputMessage);
+            return;
         }
 
-
-        static void AudioBookReport(IBookRepository repository)
+        Book? book = repository.GetById(id);
+        if (book == null)
         {
-            Book[] books = repository.GetAll();
-            int totalDuration = 0;
-            int maxDuration = 0;
-
-            for (int i = 0; i < books.Length; i++)
-            {
-                if (books[i] is AudioBook ab)
-                {
-                    totalDuration += ab.DurationMinutes;
-
-                    if (ab.DurationMinutes > maxDuration)
-                    {
-                        maxDuration = ab.DurationMinutes;
-                    }
-                }
-            }
-
-            Console.WriteLine($"{totalDuration}; {maxDuration}");
+            Console.WriteLine("Book not found.");
+            return;
         }
 
-        static void DigitalBookReport(IBookRepository repository)
+        switch (book)
         {
-            Book[] books = repository.GetAll();
-            double totalSize = 0;
-            double maxSize = 0;
-
-            for (int i = 0; i < books.Length; i++)
-            {
-                if (books[i] is DigitalBook db)
+            case PhysicalBook p:
+                if (p.Return()) // update total += 1
                 {
-                    // Note: Make sure FileSizeMB matches your property casing exactly (FileSizeMB vs FileSizeMb)
-                    totalSize += db.FileSizeMB;
-
-                    if (db.FileSizeMB > maxSize)
+                    if (repository.Update(p))
                     {
-                        maxSize = db.FileSizeMB;
+                        Console.WriteLine("Book borrowed successfully!");
+                    }
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
                     }
                 }
-            }
+                break;
 
-            Console.WriteLine($"{totalSize}; {maxSize}");
-        }
+            case DigitalBook d:  // should always work if found on the library_db
+            case AudioBook a:    // should always work if found on the library_db
+                Console.WriteLine("Book returned successfully!");
+                break;
 
-        static void PhysicalBookReport(IBookRepository repository)
-        {
-            Book[] books = repository.GetAll();
-            bool first = true;
-
-            for (int i = 0; i < books.Length; i++)
-            {
-                if (books[i] is PhysicalBook pb && pb.AvailableCopies == 0)
-                {
-                    if (!first)
-                    {
-                        Console.Write("; ");
-                    }
-
-                    Console.Write($"{pb.Id}; {pb.Title}");
-                    first = false;
-                }
-            }
-
-            if (!first)
-            {
-                Console.WriteLine();
-            }
+            default:    // null case -safty should not occur ->  if (book == null) than print error
+                break;
         }
     }
+
+
+    static void AudioBookReport(IBookRepository repository)
+    {
+        Book[] books = repository.GetAll();
+        int totalDuration = 0;
+        int maxDuration = 0;
+
+        for (int i = 0; i < books.Length; i++)
+        {
+            if (books[i] is AudioBook ab)
+            {
+                totalDuration += ab.DurationMinutes;
+
+                if (ab.DurationMinutes > maxDuration)
+                {
+                    maxDuration = ab.DurationMinutes;
+                }
+            }
+        }
+
+        Console.WriteLine($"{totalDuration}; {maxDuration}");
+    }
+
+    static void DigitalBookReport(IBookRepository repository)
+    {
+        Book[] books = repository.GetAll();
+        double totalSize = 0;
+        double maxSize = 0;
+
+        for (int i = 0; i < books.Length; i++)
+        {
+            if (books[i] is DigitalBook db)
+            {
+                // Note: Make sure FileSizeMB matches your property casing exactly (FileSizeMB vs FileSizeMb)
+                totalSize += db.FileSizeMB;
+
+                if (db.FileSizeMB > maxSize)
+                {
+                    maxSize = db.FileSizeMB;
+                }
+            }
+        }
+
+        Console.WriteLine($"{totalSize}; {maxSize}");
+    }
+
+    static void PhysicalBookReport(IBookRepository repository)
+    {
+        Book[] books = repository.GetAll();
+        bool first = true;
+
+        for (int i = 0; i < books.Length; i++)
+        {
+            if (books[i] is PhysicalBook pb && pb.AvailableCopies == 0)
+            {
+                if (!first)
+                {
+                    Console.Write("; ");
+                }
+
+                Console.Write($"{pb.Id}; {pb.Title}");
+                first = false;
+            }
+        }
+
+        if (!first)
+        {
+            Console.WriteLine();
+        }
+    }
+}
