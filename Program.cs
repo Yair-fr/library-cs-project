@@ -6,8 +6,6 @@
  */
 
 
-
-// Application entry point
 public class Program
 {
 
@@ -17,7 +15,6 @@ public class Program
     public static void Main(string[] args)
     {
         IBookRepository repository = new MySqlBookRepository();
-        // Library library = new Library(repository);
         bool running = true;
 
         string txt_menu = $"\n1. Add physical book \n" +
@@ -40,11 +37,9 @@ public class Program
                 case "1":
                 case "2":
                 case "3":
-                    // Pass 'repository' instead of 'library'
                     ExecuteAddBook(repository, choice);
                     break;
                 case "4":
-                    // Pull all books directly from the database and print them
                     PrintAllBooksUI(repository);
                     break;
                 case "5":
@@ -56,15 +51,12 @@ public class Program
                     break;
                 case "7":
                     DigitalBookReport(repository);
-                    // ExecuteReportUI(repository, "DIGITAL");
                     break;
                 case "8":
                     AudioBookReport(repository);
-                    // ExecuteReportUI(repository, "AUDIO");
                     break;
                 case "9":
-                    PhysicalBookReport(repository); // Changed from library.PhysicalBookReport();
-                    // ExecuteReportUI(repository, "PHYSICAL");
+                    PhysicalBookReport(repository); 
                     break;
                 case "10":
                     running = false;
@@ -233,7 +225,7 @@ public class Program
         Book? book = repository.GetById(id);
         if (book == null)
         {
-            Console.WriteLine(DatabaseErrorMessage); 
+            Console.WriteLine(DatabaseErrorMessage); // NEED TO SEE IF MSG IS CORRECT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             return;
         }
 

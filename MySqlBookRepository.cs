@@ -19,7 +19,7 @@ public class MySqlBookRepository : IBookRepository
     public bool Add(Book book)
     {
         string insertSql = "INSERT INTO books (id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator) " +
-                           "VALUES (@id, @title, @author, @type, @pages, @available_copies, @file_size_mb, @format, @duration_minutes, @narrator)";
+                            "VALUES (@id, @title, @author, @type, @pages, @available_copies, @file_size_mb, @format, @duration_minutes, @narrator)";
 
         string type;
         int? pages;
@@ -78,24 +78,12 @@ public class MySqlBookRepository : IBookRepository
                 cmd.Parameters.AddWithValue("@author", book.Author);
                 cmd.Parameters.AddWithValue("@type", type);
 
-                // For columns that do not belong to the current book type, send DBNull.Value to MySQL
                 cmd.Parameters.Add("@pages", MySqlDbType.Int32).Value = pages.HasValue ? pages.Value : DBNull.Value;
-                // cmd.Parameters.AddWithValue("@pages", pages.HasValue ? (object)pages.Value : DBNull.Value);
-
                 cmd.Parameters.Add("@available_copies", MySqlDbType.Int32).Value = copies.HasValue ? copies.Value : DBNull.Value;
-                // cmd.Parameters.AddWithValue("@available_copies", copies.HasValue ? (object)copies.Value : DBNull.Value);
-
                 cmd.Parameters.Add("@file_size_mb", MySqlDbType.Double).Value = size.HasValue ? size.Value : DBNull.Value;
-                // cmd.Parameters.AddWithValue("@file_size_mb", size.HasValue ? (object)size.Value : DBNull.Value);
-
                 cmd.Parameters.Add("@format", MySqlDbType.VarChar).Value = format != null ? format : DBNull.Value;
-                // cmd.Parameters.AddWithValue("@format", format != null ? (object)format : DBNull.Value);
-
                 cmd.Parameters.Add("@duration_minutes", MySqlDbType.Int32).Value = duration.HasValue ? duration.Value : DBNull.Value;
-                // cmd.Parameters.AddWithValue("@duration_minutes", duration.HasValue ? (object)duration.Value : DBNull.Value);
-
                 cmd.Parameters.Add("@narrator", MySqlDbType.VarChar).Value = narrator != null ? narrator : DBNull.Value;
-                // cmd.Parameters.AddWithValue("@narrator", narrator != null ? (object)narrator : DBNull.Value);
 
                 int rowsAffected = cmd.ExecuteNonQuery();
                 return rowsAffected == 1;
