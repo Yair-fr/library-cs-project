@@ -162,7 +162,9 @@ public class MySqlBookRepository : IBookRepository
                         {
                             if (currentIndex >= books.Length)
                             {
-                                Array.Resize(ref books, books.Length * 2);
+                                // Array.Resize(ref books, books.Length * 2);
+                                ResizeBooksArray(books); // books now is resize and has all the data
+
                             }
 
                             books[currentIndex] = currentBook;
@@ -177,9 +179,32 @@ public class MySqlBookRepository : IBookRepository
             return new Book[0];
         }
 
-        Array.Resize(ref books, currentIndex);
+        ResizeBooksArray(books); // books now is resize and has all the data
         return books;
     }
+
+
+
+    // Helper method to Resize Array * 2 on the original Array
+    public void ResizeBooksArray(Book[] books)
+    {
+        // 1. Create a new array that is double the size of the original
+        Book[] newBooks = new Book[books.Length * 2];
+
+        // 2. Copy all items from the old array to the new array
+        for (int i = 0; i < books.Length; i++)
+        {
+            newBooks[i] = books[i];
+        }
+
+        // 3. Assign the new larger array back to the original reference
+        books = newBooks;
+    }
+
+
+
+
+
 
     public bool Update(Book book)
     {
@@ -262,30 +287,5 @@ public class MySqlBookRepository : IBookRepository
             default:
                 return null; // Unknown book type in database safely ignored
         }
-        // if (type == "PHYSICAL")
-        // {
-        //     int pages = reader.IsDBNull(reader.GetOrdinal("pages")) ? 0 : reader.GetInt32("pages");
-        //     int copies = reader.IsDBNull(reader.GetOrdinal("available_copies")) ? 0 : reader.GetInt32("available_copies");
-
-        //     return new PhysicalBook(id, title, author, pages, copies);
-        // }
-
-        // if (type == "DIGITAL")
-        // {
-        //     double fileSize = reader.IsDBNull(reader.GetOrdinal("file_size_mb")) ? 0.0 : reader.GetDouble("file_size_mb");
-        //     string format = reader.IsDBNull(reader.GetOrdinal("format")) ? "" : reader.GetString("format");
-
-        //     return new DigitalBook(id, title, author, fileSize, format);
-        // }
-
-        // if (type == "AUDIO")
-        // {
-        //     int duration = reader.IsDBNull(reader.GetOrdinal("duration_minutes")) ? 0 : reader.GetInt32("duration_minutes");
-        //     string narrator = reader.IsDBNull(reader.GetOrdinal("narrator")) ? "" : reader.GetString("narrator");
-
-        //     return new AudioBook(id, title, author, duration, narrator);
-        // }
-
-        // return null;
     }
 }

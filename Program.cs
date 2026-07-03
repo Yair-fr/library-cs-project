@@ -66,34 +66,6 @@ public class Program
                     PhysicalBookReport(repository); // Changed from library.PhysicalBookReport();
                     // ExecuteReportUI(repository, "PHYSICAL");
                     break;
-                // case "1": // CHANGE REQUIRED: Pass 'repository' instead of 'library'
-                //     ExecuteAddBook(library, choice); //repository.AddBook(pb)
-                //     break;
-                // case "2": // CHANGE REQUIRED: Pass 'repository' instead of 'library'
-                //     ExecuteAddBook(library, choice); //repository.AddBook(db)
-                //     break;
-                // case "3": // CHANGE REQUIRED: Pass 'repository' instead of 'library'
-                //     ExecuteAddBook(library, choice); //repository.AddBook(ab)
-                //     break;
-
-                // case "4": // CHANGE REQUIRED: Change to 'repository.PrintAllBooks()' or iterate over 'repository.GetAllBooks()'
-                //     library.PrintAllBooks();
-                //     break;
-                // case "5": // CHANGE REQUIRED: Pass 'repository' instead of 'library'
-                //     BorrowBookUI(library);
-                //     break;
-                // case "6": // CHANGE REQUIRED: Pass 'repository' instead of 'library'
-                //     ReturnBookUI(library);
-                //     break;
-                // case "7": // CHANGE REQUIRED: Change to 'repository.DigitalBookReport()'
-                //     library.DigitalBookReport();
-                //     break;
-                // case "8": // CHANGE REQUIRED: Change to 'repository.AudioBookReport()'
-                //     library.AudioBookReport();
-                //     break;
-                // case "9": // CHANGE REQUIRED: Change to 'repository.PhysicalBookReport()'
-                //     library.PhysicalBookReport();
-                //     break;
                 case "10":
                     running = false;
                     break;
@@ -135,15 +107,6 @@ public class Program
 
 
 
-
-
-    // CHANGE REQUIRED: Change signature parameter 
-    // from 'Library library' to 'IBookRepository repository'
-
-
-    // OLD method static void ExecuteAddBook(Library library, string user_choice)
-
-
     // Unified addition UI mapping directly into repo.Add()
     static void ExecuteAddBook(IBookRepository repository, string user_choice)
     {
@@ -170,7 +133,6 @@ public class Program
                     }
 
                     PhysicalBook pb = new PhysicalBook(id, title, author, pages, copies);
-                    // CHANGE REQUIRED: Change 'library.AddBook(pb)' to 'repository.AddBook(pb)'
                     if (repository.Add(pb))
                     {
                         Console.WriteLine("\nBook added successfully");
@@ -197,7 +159,6 @@ public class Program
                     }
 
                     DigitalBook db = new DigitalBook(id, title, author, size, format);
-                    // CHANGE REQUIRED: Change 'library.AddBook(db)' to 'repository.AddBook(db)'
                     if (repository.Add(db))
                     {
                         Console.WriteLine("\nBook added successfully");
@@ -224,7 +185,6 @@ public class Program
                     }
 
                     AudioBook ab = new AudioBook(id, title, author, duration, narrator);
-                    // CHANGE REQUIRED: Change 'library.AddBook(ab)' to 'repository.AddBook(ab)'
                     if (repository.Add(ab))
                     {
                         Console.WriteLine("\nBook added successfully");
@@ -247,7 +207,14 @@ public class Program
         Book[] bk = repository.GetAll();
         foreach (Book item in bk)
         {
-            item.PrintInfo();
+            if (item == null)
+            {
+                break;
+            }
+            else
+            {
+                item.PrintInfo();;
+            }
         }
     }
 
@@ -266,7 +233,7 @@ public class Program
         Book? book = repository.GetById(id);
         if (book == null)
         {
-            Console.WriteLine("Book not found.");
+            Console.WriteLine("Book not found."); // NEED TO SEE IF MSG IS CORRECT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             return;
         }
 
