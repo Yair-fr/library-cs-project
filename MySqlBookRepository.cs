@@ -19,7 +19,7 @@ public class MySqlBookRepository : IBookRepository
     public bool Add(Book book)
     {
         string insertSql = "INSERT INTO books (id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator) " +
-                            "VALUES (@id, @title, @author, @type, @pages, @available_copies, @file_size_mb, @format, @duration_minutes, @narrator)";
+                           "VALUES (@id, @title, @author, @type, @pages, @available_copies, @file_size_mb, @format, @duration_minutes, @narrator)";
 
         string type;
         int? pages;
