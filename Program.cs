@@ -233,7 +233,7 @@ public class Program
         Book? book = repository.GetById(id);
         if (book == null)
         {
-            Console.WriteLine("Book not found."); // NEED TO SEE IF MSG IS CORRECT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            Console.WriteLine(DatabaseErrorMessage); 
             return;
         }
 
@@ -279,7 +279,7 @@ public class Program
         Book? book = repository.GetById(id);
         if (book == null)
         {
-            Console.WriteLine("Book not found.");
+            Console.WriteLine(DatabaseErrorMessage);
             return;
         }
 
