@@ -1,12 +1,12 @@
 // Base class for books
-public class Book
+public abstract class Book
 {
     // Private backing fields
     private int _id;
     private string _title;
     private string _author;
 
-    // Constractor
+    // Constractor for derived classes
     public Book(int id, string title, string author)
     {
         Id = id;            // Invokes Id setter validation

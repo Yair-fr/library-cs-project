@@ -5,12 +5,13 @@ public class MySqlBookRepository : IBookRepository
     // Check user and password
     private string _connectionString = "server=localhost;database=library_db;user=root;password=admin;";
 
+    // Constructor
     public MySqlBookRepository(string connectionString)
     {
         _connectionString = connectionString;
     }
 
-    // Empty constructor
+    // Default empty constructor
     public MySqlBookRepository() : this("server=localhost;database=library_db;user=root;password=admin;")
     {
     }
@@ -62,7 +63,7 @@ public class MySqlBookRepository : IBookRepository
                 break;
 
             default:
-                return false; // Unknown book type, abort execution safely
+                return false; // Unknown book type or null, abort execution safely
         }
 
         try
@@ -78,12 +79,23 @@ public class MySqlBookRepository : IBookRepository
                 cmd.Parameters.AddWithValue("@type", type);
 
                 // For columns that do not belong to the current book type, send DBNull.Value to MySQL
-                cmd.Parameters.AddWithValue("@pages", pages.HasValue ? (object)pages.Value : DBNull.Value);
-                cmd.Parameters.AddWithValue("@available_copies", copies.HasValue ? (object)copies.Value : DBNull.Value);
-                cmd.Parameters.AddWithValue("@file_size_mb", size.HasValue ? (object)size.Value : DBNull.Value);
-                cmd.Parameters.AddWithValue("@format", format != null ? (object)format : DBNull.Value);
-                cmd.Parameters.AddWithValue("@duration_minutes", duration.HasValue ? (object)duration.Value : DBNull.Value);
-                cmd.Parameters.AddWithValue("@narrator", narrator != null ? (object)narrator : DBNull.Value);
+                cmd.Parameters.Add("@pages", MySqlDbType.Int32).Value = pages.HasValue ? pages.Value : DBNull.Value;
+                // cmd.Parameters.AddWithValue("@pages", pages.HasValue ? (object)pages.Value : DBNull.Value);
+
+                cmd.Parameters.Add("@available_copies", MySqlDbType.Int32).Value = copies.HasValue ? copies.Value : DBNull.Value;
+                // cmd.Parameters.AddWithValue("@available_copies", copies.HasValue ? (object)copies.Value : DBNull.Value);
+
+                cmd.Parameters.Add("@file_size_mb", MySqlDbType.Double).Value = size.HasValue ? size.Value : DBNull.Value;
+                // cmd.Parameters.AddWithValue("@file_size_mb", size.HasValue ? (object)size.Value : DBNull.Value);
+
+                cmd.Parameters.Add("@format", MySqlDbType.VarChar).Value = format != null ? format : DBNull.Value;
+                // cmd.Parameters.AddWithValue("@format", format != null ? (object)format : DBNull.Value);
+
+                cmd.Parameters.Add("@duration_minutes", MySqlDbType.Int32).Value = duration.HasValue ? duration.Value : DBNull.Value;
+                // cmd.Parameters.AddWithValue("@duration_minutes", duration.HasValue ? (object)duration.Value : DBNull.Value);
+
+                cmd.Parameters.Add("@narrator", MySqlDbType.VarChar).Value = narrator != null ? narrator : DBNull.Value;
+                // cmd.Parameters.AddWithValue("@narrator", narrator != null ? (object)narrator : DBNull.Value);
 
                 int rowsAffected = cmd.ExecuteNonQuery();
                 return rowsAffected == 1;
@@ -98,7 +110,7 @@ public class MySqlBookRepository : IBookRepository
     public Book? GetById(int id)
     {
         string selectSql = "SELECT id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator " +
-                           "FROM books WHERE id = @id";
+                            "FROM books WHERE id = @id";
 
         try
         {
@@ -150,7 +162,9 @@ public class MySqlBookRepository : IBookRepository
                         {
                             if (currentIndex >= books.Length)
                             {
-                                Array.Resize(ref books, books.Length * 2);
+                                // Array.Resize(ref books, books.Length * 2);
+                                ResizeBooksArray(books); // books now is resize and has all the data
+
                             }
 
                             books[currentIndex] = currentBook;
@@ -165,9 +179,32 @@ public class MySqlBookRepository : IBookRepository
             return new Book[0];
         }
 
-        Array.Resize(ref books, currentIndex);
+        ResizeBooksArray(books); // books now is resize and has all the data
         return books;
     }
+
+
+
+    // Helper method to Resize Array * 2 on the original Array
+    public void ResizeBooksArray(Book[] books)
+    {
+        // 1. Create a new array that is double the size of the original
+        Book[] newBooks = new Book[books.Length * 2];
+
+        // 2. Copy all items from the old array to the new array
+        for (int i = 0; i < books.Length; i++)
+        {
+            newBooks[i] = books[i];
+        }
+
+        // 3. Assign the new larger array back to the original reference
+        books = newBooks;
+    }
+
+
+
+
+
 
     public bool Update(Book book)
     {
@@ -179,8 +216,11 @@ public class MySqlBookRepository : IBookRepository
                 using (MySqlCommand cmd = new MySqlCommand(
                     "UPDATE books SET available_copies = @available_copies WHERE id = @id", conn))
                 {
-                    cmd.Parameters.AddWithValue("@available_copies", pb.AvailableCopies);
-                    cmd.Parameters.AddWithValue("@id", pb.Id);
+                    // Clean syntax
+                    cmd.Parameters.Add("@available_copies", MySqlDbType.Int32).Value = pb.AvailableCopies;
+                    cmd.Parameters.Add("@id", MySqlDbType.Int32).Value = pb.Id;
+                    // cmd.Parameters.AddWithValue("@available_copies", pb.AvailableCopies);
+                    // cmd.Parameters.AddWithValue("@id", pb.Id);
 
                     conn.Open();
                     return cmd.ExecuteNonQuery() == 1;
@@ -203,7 +243,9 @@ public class MySqlBookRepository : IBookRepository
             using (MySqlConnection conn = new MySqlConnection(_connectionString))
             using (MySqlCommand cmd = new MySqlCommand("DELETE FROM books WHERE id = @id", conn))
             {
-                cmd.Parameters.AddWithValue("@id", id);
+                // Explicitly set as a 32-bit Integer for absolute type consistency
+                cmd.Parameters.Add("@id", MySqlDbType.Int32).Value = id;
+                // cmd.Parameters.AddWithValue("@id", id);
 
                 conn.Open();
                 return cmd.ExecuteNonQuery() == 1;
@@ -217,35 +259,33 @@ public class MySqlBookRepository : IBookRepository
 
     private Book? CreateBookFromReader(MySqlDataReader reader)
     {
+        // These fields are required for all books and are never NULL
         int id = reader.GetInt32("id");
         string title = reader.GetString("title");
         string author = reader.GetString("author");
-        string type = reader.GetString("type").ToUpper();
+        string type = reader.GetString("type");
 
-        if (type == "PHYSICAL")
+        // Use standard switch pattern mapping to reconstruct the exact subclass
+        switch (type.ToUpper())
         {
-            int pages = reader.IsDBNull(reader.GetOrdinal("pages")) ? 0 : reader.GetInt32("pages");
-            int copies = reader.IsDBNull(reader.GetOrdinal("available_copies")) ? 0 : reader.GetInt32("available_copies");
+            case "PHYSICAL":
+                // Safely read columns only if they are not DBNull
+                int pages = !reader.IsDBNull(reader.GetOrdinal("pages")) ? reader.GetInt32("pages") : 0;
+                int copies = !reader.IsDBNull(reader.GetOrdinal("available_copies")) ? reader.GetInt32("available_copies") : 0;
+                return new PhysicalBook(id, title, author, pages, copies);
 
-            return new PhysicalBook(id, title, author, pages, copies);
+            case "DIGITAL":
+                double size = !reader.IsDBNull(reader.GetOrdinal("file_size_mb")) ? reader.GetDouble("file_size_mb") : 0.0;
+                string format = !reader.IsDBNull(reader.GetOrdinal("format")) ? reader.GetString("format") : "";
+                return new DigitalBook(id, title, author, size, format);
+
+            case "AUDIO":
+                int duration = !reader.IsDBNull(reader.GetOrdinal("duration_minutes")) ? reader.GetInt32("duration_minutes") : 0;
+                string narrator = !reader.IsDBNull(reader.GetOrdinal("narrator")) ? reader.GetString("narrator") : "";
+                return new AudioBook(id, title, author, duration, narrator);
+
+            default:
+                return null; // Unknown book type in database safely ignored
         }
-
-        if (type == "DIGITAL")
-        {
-            double fileSize = reader.IsDBNull(reader.GetOrdinal("file_size_mb")) ? 0.0 : reader.GetDouble("file_size_mb");
-            string format = reader.IsDBNull(reader.GetOrdinal("format")) ? "" : reader.GetString("format");
-
-            return new DigitalBook(id, title, author, fileSize, format);
-        }
-
-        if (type == "AUDIO")
-        {
-            int duration = reader.IsDBNull(reader.GetOrdinal("duration_minutes")) ? 0 : reader.GetInt32("duration_minutes");
-            string narrator = reader.IsDBNull(reader.GetOrdinal("narrator")) ? "" : reader.GetString("narrator");
-
-            return new AudioBook(id, title, author, duration, narrator);
-        }
-
-        return null;
     }
 }

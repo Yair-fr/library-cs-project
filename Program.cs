@@ -13,15 +13,12 @@ public class Program
 
     // new flag for error
     const string InvalidInputMessage = "Invalid input. Please try again.";
-    private static MySqlBookRepository ripo = new MySqlBookRepository();
+    const string DatabaseErrorMessage = "Database error occurred. Operation failed.";
     public static void Main(string[] args)
     {
-        Library library = new Library();
+        IBookRepository repository = new MySqlBookRepository();
+        // Library library = new Library(repository);
         bool running = true;
-        
-
-
-
 
         string txt_menu = $"\n1. Add physical book \n" +
                             "2. Add digital book \n" +
@@ -41,31 +38,33 @@ public class Program
             switch (choice)
             {
                 case "1":
-                    ExecuteAddBook(library, choice);
-                    break;
                 case "2":
-                    ExecuteAddBook(library, choice);
-                    break;
                 case "3":
-                    ExecuteAddBook(library, choice);
+                    // Pass 'repository' instead of 'library'
+                    ExecuteAddBook(repository, choice);
                     break;
                 case "4":
-                    library.PrintAllBooks();
+                    // Pull all books directly from the database and print them
+                    PrintAllBooksUI(repository);
                     break;
                 case "5":
-                    BorrowBookUI(library);
+                    BorrowBookUI(repository);
+
                     break;
                 case "6":
-                    ReturnBookUI(library);
+                    ReturnBookUI(repository);
                     break;
                 case "7":
-                    library.DigitalBookReport();
+                    DigitalBookReport(repository);
+                    // ExecuteReportUI(repository, "DIGITAL");
                     break;
                 case "8":
-                    library.AudioBookReport();
+                    AudioBookReport(repository);
+                    // ExecuteReportUI(repository, "AUDIO");
                     break;
                 case "9":
-                    library.PhysicalBookReport();
+                    PhysicalBookReport(repository); // Changed from library.PhysicalBookReport();
+                    // ExecuteReportUI(repository, "PHYSICAL");
                     break;
                 case "10":
                     running = false;
@@ -76,26 +75,16 @@ public class Program
 
 
 
-    // Replace for GetInt INT 
+    // Helper validation inputs
     static bool TryReadNonNegativeInt(string input, out int value)
     {
         return int.TryParse(input, out value) && value >= 0;
     }
-
     // Replace for GetDouble 
     static bool TryReadNonNegativeDouble(string input, out double value)
     {
         return double.TryParse(input, out value) && value >= 0;
     }
-
-
-
-
-
-
-
-
-
     // DRY helper methods for console input
     static string GetInput(string prompt)
     {
@@ -103,21 +92,24 @@ public class Program
         return Console.ReadLine() ?? ""; // if null than empty string ""
     }
 
-    // static int GetInt(string prompt)
-    // { //                   maybe here print the error msg isted of 'prompt'
-    //     return int.TryParse(GetInput(prompt), out int value) ? value : GetInt("Invalid input. Please try again."); // if value <= 0 than "Invalid input. Please try again."
-    // }
 
-    // static double GetDouble(string prompt)
-    // {
-    //     return double.TryParse(GetInput(prompt), out double value) ? value : GetDouble(prompt);
-    // }
 
-    // Unified DRY helper for adding books
-    static void ExecuteAddBook(Library library, string user_choice)
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Unified addition UI mapping directly into repo.Add()
+    static void ExecuteAddBook(IBookRepository repository, string user_choice)
     {
-        // Ripo to add SQL data
-        // MySqlBookRepository ripo = new MySqlBookRepository();
 
         string idInput = GetInput("Enter ID: ");
         string title = GetInput("Enter Title: ");
@@ -141,9 +133,14 @@ public class Program
                     }
 
                     PhysicalBook pb = new PhysicalBook(id, title, author, pages, copies);
-                    library.AddBook(pb);
-                    // add to sql
-                    ripo.Add(pb); 
+                    if (repository.Add(pb))
+                    {
+                        Console.WriteLine("\nBook added successfully");
+                    }
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
+                    }
                     break;
                 }
 
@@ -162,9 +159,14 @@ public class Program
                     }
 
                     DigitalBook db = new DigitalBook(id, title, author, size, format);
-                    library.AddBook(db);
-                    // add to sql
-                    ripo.Add(db); 
+                    if (repository.Add(db))
+                    {
+                        Console.WriteLine("\nBook added successfully");
+                    }
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
+                    }
                     break;
                 }
 
@@ -183,53 +185,198 @@ public class Program
                     }
 
                     AudioBook ab = new AudioBook(id, title, author, duration, narrator);
-                    library.AddBook(ab);
-                    // add to sql
-                    ripo.Add(ab); 
+                    if (repository.Add(ab))
+                    {
+                        Console.WriteLine("\nBook added successfully");
+                    }
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
+                    }
                     break;
                 }
         }
     }
 
-    static void BorrowBookUI(Library library)
+
+
+
+    // Prints all items coming out of your modern List/Array GetAll database query
+    static void PrintAllBooksUI(IBookRepository repository)
     {
-        string idInput = GetInput("Enter Book ID: ");
-
-        if (!TryReadNonNegativeInt(idInput, out int id))
+        Book[] bk = repository.GetAll();
+        foreach (Book item in bk)
         {
-            Console.WriteLine(InvalidInputMessage);
-            return;
-        }
-
-        // if (ripo.GetById(id))
-        if (library.BorrowBook(id))
-        {
-            ripo.GetById(id);
-            Console.WriteLine("Book borrowed successfully");
-        }
-        else
-        {
-            Console.WriteLine("Error, book not borrowed");
+            if (item == null)
+            {
+                break;
+            }
+            else
+            {
+                item.PrintInfo();;
+            }
         }
     }
 
-    static void ReturnBookUI(Library library)
-    {
-        string idInput = GetInput("Enter Book ID: ");
 
+
+    // Borrow logic using repository actions
+    static void BorrowBookUI(IBookRepository repository)
+    {
+        string idInput = GetInput("Enter Book ID to Borrow: ");
         if (!TryReadNonNegativeInt(idInput, out int id))
         {
             Console.WriteLine(InvalidInputMessage);
             return;
         }
 
-        if (library.ReturnBook(id))
+        Book? book = repository.GetById(id);
+        if (book == null)
         {
-            Console.WriteLine("Book returned successfully");
+            Console.WriteLine(DatabaseErrorMessage); 
+            return;
         }
-        else
+
+        switch (book)
         {
-            Console.WriteLine("Error, book not returned");
+            case PhysicalBook p:
+                if (p.Borrow()) // update total -= 1
+                {
+                    if (repository.Update(p))
+                    {
+                        Console.WriteLine("Book borrowed successfully!");
+                    }
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
+                    }
+                }
+                break;
+
+            case DigitalBook d:  // should always work if found on the library_db
+            case AudioBook a:    // should always work if found on the library_db
+                Console.WriteLine("Book borrowed successfully!");
+                break;
+
+            default:    // null case -safty should not occur ->  if (book == null) than print error
+                break;
+        }
+    }
+
+
+
+
+    // Return logic using repository actions
+    static void ReturnBookUI(IBookRepository repository)
+    {
+        string idInput = GetInput("Enter Book ID to Return: ");
+        if (!TryReadNonNegativeInt(idInput, out int id))
+        {
+            Console.WriteLine(InvalidInputMessage);
+            return;
+        }
+
+        Book? book = repository.GetById(id);
+        if (book == null)
+        {
+            Console.WriteLine(DatabaseErrorMessage);
+            return;
+        }
+
+        switch (book)
+        {
+            case PhysicalBook p:
+                if (p.Return()) // update total += 1
+                {
+                    if (repository.Update(p))
+                    {
+                        Console.WriteLine("Book borrowed successfully!");
+                    }
+                    else
+                    {
+                        Console.WriteLine(DatabaseErrorMessage);
+                    }
+                }
+                break;
+
+            case DigitalBook d:  // should always work if found on the library_db
+            case AudioBook a:    // should always work if found on the library_db
+                Console.WriteLine("Book returned successfully!");
+                break;
+
+            default:    // null case -safty should not occur ->  if (book == null) than print error
+                break;
+        }
+    }
+
+
+    static void AudioBookReport(IBookRepository repository)
+    {
+        Book[] books = repository.GetAll();
+        int totalDuration = 0;
+        int maxDuration = 0;
+
+        for (int i = 0; i < books.Length; i++)
+        {
+            if (books[i] is AudioBook ab)
+            {
+                totalDuration += ab.DurationMinutes;
+
+                if (ab.DurationMinutes > maxDuration)
+                {
+                    maxDuration = ab.DurationMinutes;
+                }
+            }
+        }
+
+        Console.WriteLine($"{totalDuration}; {maxDuration}");
+    }
+
+    static void DigitalBookReport(IBookRepository repository)
+    {
+        Book[] books = repository.GetAll();
+        double totalSize = 0;
+        double maxSize = 0;
+
+        for (int i = 0; i < books.Length; i++)
+        {
+            if (books[i] is DigitalBook db)
+            {
+                // Note: Make sure FileSizeMB matches your property casing exactly (FileSizeMB vs FileSizeMb)
+                totalSize += db.FileSizeMB;
+
+                if (db.FileSizeMB > maxSize)
+                {
+                    maxSize = db.FileSizeMB;
+                }
+            }
+        }
+
+        Console.WriteLine($"{totalSize}; {maxSize}");
+    }
+
+    static void PhysicalBookReport(IBookRepository repository)
+    {
+        Book[] books = repository.GetAll();
+        bool first = true;
+
+        for (int i = 0; i < books.Length; i++)
+        {
+            if (books[i] is PhysicalBook pb && pb.AvailableCopies == 0)
+            {
+                if (!first)
+                {
+                    Console.Write("; ");
+                }
+
+                Console.Write($"{pb.Id}; {pb.Title}");
+                first = false;
+            }
+        }
+
+        if (!first)
+        {
+            Console.WriteLine();
         }
     }
 }
