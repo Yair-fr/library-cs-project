@@ -199,7 +199,6 @@ public class Program
         Book[] bk = repository.GetAll();
         if(bk.Length == 2 && bk[0] == null && bk[1] == null) // Edge case cover connection error in count rows
         {
-            System.Console.WriteLine("DEBUG");
             Console.WriteLine(DatabaseErrorMessage);
         }
         foreach (Book item in bk)

@@ -137,7 +137,7 @@ public class MySqlBookRepository : IBookRepository
 
         try
         {
-            using (MySqlConnection conn = new MySqlConnection(_connectionString + "123"))
+            using (MySqlConnection conn = new MySqlConnection(_connectionString))
             using (MySqlCommand cmd = new MySqlCommand(countSql, conn))
             {
                 conn.Open();
