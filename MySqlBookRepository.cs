@@ -137,7 +137,7 @@ public class MySqlBookRepository : IBookRepository
 
         try
         {
-            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (MySqlConnection conn = new MySqlConnection(_connectionString + "123"))
             using (MySqlCommand cmd = new MySqlCommand(countSql, conn))
             {
                 conn.Open();
@@ -157,8 +157,8 @@ public class MySqlBookRepository : IBookRepository
         }
         catch (MySqlException)
         {
-            // Return 0 if a database error occurs
-            return 0;
+            // Return -1 if a database error occurs
+            return -1;
         }
     }
 
@@ -184,10 +184,14 @@ public class MySqlBookRepository : IBookRepository
         // Book[] books = new Book[100];
         // Get the actual total rows from the database to initialize the array with the exact size
         int totalRows = GetTotalBooksCount();
-        if (totalRows == 0)
+
+        switch (totalRows)
         {
-            totalRows++;
+            case -1: return new Book[2];
+            case 0: totalRows++; break;
+            default: break;
         }
+
         Book[] books = new Book[totalRows];
         int currentIndex = 0;
 
@@ -216,20 +220,28 @@ public class MySqlBookRepository : IBookRepository
                 }
             }
         }
-        catch (MySqlException) 
+        catch (MySqlException)
         {
             return new Book[1];
         }
 
-        // Return an array containing only the loaded books
-        Book[] result = new Book[currentIndex];
-
-        for (int i = 0; i < currentIndex; i++)
+        if (currentIndex > 0)
         {
-            result[i] = books[i];
-        }
 
-        return result;
+            // Return an array containing only the loaded books
+            Book[] result = new Book[currentIndex];
+
+            for (int i = 0; i < currentIndex; i++)
+            {
+                result[i] = books[i];
+            }
+
+            return result;
+        }
+        else
+        {
+            return new Book[1];
+        }
     }
 
 

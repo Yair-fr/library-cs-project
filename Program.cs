@@ -13,7 +13,7 @@ public class Program
     const string InvalidInputMessage = "Invalid input. Please try again.";
     const string DatabaseErrorMessage = "Database error occurred. Operation failed.";
     public static void Main(string[] args)
-    {   //                                      Insert STR connection here ⬇ 
+    {   //                                      Insert STR connection down here  
         IBookRepository repository = new MySqlBookRepository("server=localhost;database=library_db;user=root;password=admin;");
         bool running = true;
 
@@ -197,8 +197,9 @@ public class Program
     static void PrintAllBooksUI(IBookRepository repository)
     {
         Book[] bk = repository.GetAll();
-        if(bk[0] == null) // Edge case cover 'book[1] = null' aka empty DB
+        if(bk.Length == 2 && bk[0] == null && bk[1] == null) // Edge case cover connection error in count rows
         {
+            System.Console.WriteLine("DEBUG");
             Console.WriteLine(DatabaseErrorMessage);
         }
         foreach (Book item in bk)
