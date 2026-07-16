@@ -121,10 +121,76 @@ public class MySqlBookRepository : IBookRepository
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+    public int GetTotalBooksCount()
+    {
+        string countSql = "SELECT COUNT(*) FROM books";
+
+        try
+        {
+            using (MySqlConnection conn = new MySqlConnection(_connectionString))
+            using (MySqlCommand cmd = new MySqlCommand(countSql, conn))
+            {
+                conn.Open();
+
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    // Check if a row exists (COUNT query always returns exactly one row)
+                    if (reader.Read())
+                    {
+                        // Retrieve the count from the first column (index 0) as an integer
+                        return reader.GetInt32(0);
+                    }
+                }
+
+                return 0;
+            }
+        }
+        catch (MySqlException)
+        {
+            // Return 0 if a database error occurs
+            return 0;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public Book[] GetAll()
     {
-        Book[] books = new Book[100];
+        // Book[] books = new Book[100];
+        // Get the actual total rows from the database to initialize the array with the exact size
+        int totalRows = GetTotalBooksCount();
+        if (totalRows == 0)
+        {
+            totalRows++;
+        }
+        Book[] books = new Book[totalRows];
         int currentIndex = 0;
+
 
         string selectSql = "SELECT id, title, author, type, pages, available_copies, file_size_mb, format, duration_minutes, narrator FROM books";
 
@@ -143,13 +209,6 @@ public class MySqlBookRepository : IBookRepository
 
                         if (currentBook != null)
                         {
-                            if (currentIndex >= books.Length)
-                            {
-                                // Array.Resize(ref books, books.Length * 2);
-                                ResizeBooksArray(books); // books now is resize and has all the data
-
-                            }
-
                             books[currentIndex] = currentBook;
                             currentIndex++;
                         }
@@ -157,31 +216,20 @@ public class MySqlBookRepository : IBookRepository
                 }
             }
         }
-        catch (MySqlException)
+        catch (MySqlException) 
         {
-            return new Book[0];
+            return new Book[1];
         }
 
-        ResizeBooksArray(books); // books now is resize and has all the data
-        return books;
-    }
+        // Return an array containing only the loaded books
+        Book[] result = new Book[currentIndex];
 
-
-
-    // Helper method to Resize Array * 2 on the original Array
-    public void ResizeBooksArray(Book[] books)
-    {
-        // 1. Create a new array that is double the size of the original
-        Book[] newBooks = new Book[books.Length * 2];
-
-        // 2. Copy all items from the old array to the new array
-        for (int i = 0; i < books.Length; i++)
+        for (int i = 0; i < currentIndex; i++)
         {
-            newBooks[i] = books[i];
+            result[i] = books[i];
         }
 
-        // 3. Assign the new larger array back to the original reference
-        books = newBooks;
+        return result;
     }
 
 

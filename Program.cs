@@ -197,6 +197,10 @@ public class Program
     static void PrintAllBooksUI(IBookRepository repository)
     {
         Book[] bk = repository.GetAll();
+        if(bk[0] == null) // Edge case cover 'book[1] = null' aka empty DB
+        {
+            Console.WriteLine(DatabaseErrorMessage);
+        }
         foreach (Book item in bk)
         {
             if (item == null)
