@@ -3,17 +3,12 @@ using MySql.Data.MySqlClient;
 public class MySqlBookRepository : IBookRepository
 {
     // Check user and password
-    private string _connectionString = "server=localhost;database=library_db;user=root;password=admin;";
+    private string _connectionString;
 
     // Constructor
     public MySqlBookRepository(string connectionString)
     {
         _connectionString = connectionString;
-    }
-
-    // Default empty constructor
-    public MySqlBookRepository() : this("server=localhost;database=library_db;user=root;password=admin;")
-    {
     }
 
     public bool Add(Book book)
@@ -207,9 +202,6 @@ public class MySqlBookRepository : IBookRepository
                     // Clean syntax
                     cmd.Parameters.Add("@available_copies", MySqlDbType.Int32).Value = pb.AvailableCopies;
                     cmd.Parameters.Add("@id", MySqlDbType.Int32).Value = pb.Id;
-                    // cmd.Parameters.AddWithValue("@available_copies", pb.AvailableCopies);
-                    // cmd.Parameters.AddWithValue("@id", pb.Id);
-
                     conn.Open();
                     return cmd.ExecuteNonQuery() == 1;
                 }

@@ -13,8 +13,8 @@ public class Program
     const string InvalidInputMessage = "Invalid input. Please try again.";
     const string DatabaseErrorMessage = "Database error occurred. Operation failed.";
     public static void Main(string[] args)
-    {
-        IBookRepository repository = new MySqlBookRepository();
+    {   //                                      Insert STR connection here ⬇ 
+        IBookRepository repository = new MySqlBookRepository("server=localhost;database=library_db;user=root;password=admin;");
         bool running = true;
 
         string txt_menu = $"\n1. Add physical book \n" +
@@ -56,7 +56,7 @@ public class Program
                     AudioBookReport(repository);
                     break;
                 case "9":
-                    PhysicalBookReport(repository); 
+                    PhysicalBookReport(repository);
                     break;
                 case "10":
                     running = false;
@@ -205,7 +205,7 @@ public class Program
             }
             else
             {
-                item.PrintInfo();;
+                item.PrintInfo(); ;
             }
         }
     }
@@ -225,7 +225,7 @@ public class Program
         Book? book = repository.GetById(id);
         if (book == null)
         {
-            Console.WriteLine(DatabaseErrorMessage); // NEED TO SEE IF MSG IS CORRECT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            Console.WriteLine(DatabaseErrorMessage); 
             return;
         }
 
@@ -282,7 +282,7 @@ public class Program
                 {
                     if (repository.Update(p))
                     {
-                        Console.WriteLine("Book borrowed successfully!");
+                        Console.WriteLine("Book returned successfully!");
                     }
                     else
                     {
