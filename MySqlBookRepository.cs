@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 public class MySqlBookRepository : IBookRepository
@@ -222,7 +224,7 @@ public class MySqlBookRepository : IBookRepository
         }
         catch (MySqlException)
         {
-            return new Book[1];
+            return new Book[2];
         }
 
         if (currentIndex > 0)
@@ -240,7 +242,7 @@ public class MySqlBookRepository : IBookRepository
         }
         else
         {
-            return new Book[1];
+            return new Book[0];
         }
     }
 
