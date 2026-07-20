@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 
 /*
@@ -14,7 +14,7 @@ public class Program
     const string DatabaseErrorMessage = "Database error occurred. Operation failed.";
     public static void Main(string[] args)
     {   //                                      Insert STR connection down here  
-        IBookRepository repository = new MySqlBookRepository("server=localhost;database=library_db;user=root;password=admin;");
+        IBookRepository repository = new MySqlBookRepository("server=localhost;port=3306;database=library_db;user=root;password=admin;");
         bool running = true;
 
         string txt_menu = $"\n1. Add physical book \n" +
@@ -23,9 +23,9 @@ public class Program
                             "4. List all books \n" +
                             "5. Borrow book \n" +
                             "6. Return book \n" +
-                            "7. Digital book report \n" +
-                            "8. Audio book report \n" +
-                            "9. Physical book report \n" +
+                            "7. Digital Book Report \n" +
+                            "8. Audio Book Report \n" +
+                            "9. Physical Book Report \n" +
                             "10. Exit \n\n";
 
         while (running)
@@ -60,6 +60,9 @@ public class Program
                     break;
                 case "10":
                     running = false;
+                    break;
+                default:
+                    Console.WriteLine(InvalidInputMessage);
                     break;
             }
         }
@@ -127,7 +130,7 @@ public class Program
                     PhysicalBook pb = new PhysicalBook(id, title, author, pages, copies);
                     if (repository.Add(pb))
                     {
-                        Console.WriteLine("\nBook added successfully");
+                        Console.WriteLine("Book added successfully");
                     }
                     else
                     {
@@ -153,7 +156,7 @@ public class Program
                     DigitalBook db = new DigitalBook(id, title, author, size, format);
                     if (repository.Add(db))
                     {
-                        Console.WriteLine("\nBook added successfully");
+                        Console.WriteLine("Book added successfully");
                     }
                     else
                     {
@@ -179,7 +182,7 @@ public class Program
                     AudioBook ab = new AudioBook(id, title, author, duration, narrator);
                     if (repository.Add(ab))
                     {
-                        Console.WriteLine("\nBook added successfully");
+                        Console.WriteLine("Book added successfully");
                     }
                     else
                     {
@@ -240,18 +243,22 @@ public class Program
                 {
                     if (repository.Update(p))
                     {
-                        Console.WriteLine("Book borrowed successfully!");
+                        Console.WriteLine("Book borrowed successfully");
                     }
                     else
                     {
                         Console.WriteLine(DatabaseErrorMessage);
                     }
                 }
+                else
+                {
+                    Console.WriteLine(DatabaseErrorMessage);  
+                }
                 break;
 
             case DigitalBook d:  // should always work if found on the library_db
             case AudioBook a:    // should always work if found on the library_db
-                Console.WriteLine("Book borrowed successfully!");
+                Console.WriteLine("Book borrowed successfully");
                 break;
 
             default:    // null case -safty should not occur ->  if (book == null) than print error
@@ -286,7 +293,7 @@ public class Program
                 {
                     if (repository.Update(p))
                     {
-                        Console.WriteLine("Book returned successfully!");
+                        Console.WriteLine("Book returned successfully");
                     }
                     else
                     {
@@ -297,7 +304,7 @@ public class Program
 
             case DigitalBook d:  // should always work if found on the library_db
             case AudioBook a:    // should always work if found on the library_db
-                Console.WriteLine("Book returned successfully!");
+                Console.WriteLine("Book returned successfully");
                 break;
 
             default:    // null case -safty should not occur ->  if (book == null) than print error
@@ -348,7 +355,7 @@ public class Program
             }
         }
 
-        Console.WriteLine($"{totalSize}; {maxSize}");
+        Console.WriteLine($"{totalSize:0.##}; {maxSize:0.##}");
     }
 
     static void PhysicalBookReport(IBookRepository repository)
