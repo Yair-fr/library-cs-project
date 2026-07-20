@@ -355,7 +355,7 @@ public class Program
             }
         }
 
-        Console.WriteLine($"{totalSize:0.##}; {maxSize:0.##}");
+        Console.WriteLine($"{totalSize}; {maxSize}");
     }
 
     static void PhysicalBookReport(IBookRepository repository)
